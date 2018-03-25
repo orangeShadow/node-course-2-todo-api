@@ -8,11 +8,13 @@ const {Todo} = require('./../models/todo');
 const todos = [
   {
     _id: new ObjectID(),
-    text: 'Frist test todo'
+    text: 'Frist test todo',
   },
   {
     _id: new ObjectID(),
-    text: 'Second test todo'
+    text: 'Second test todo',
+    completed: true,
+    completedAt: 3333
   }
 ];
 
@@ -138,6 +140,64 @@ describe('DELETE /todos/:id', () => {
           done();
         }).catch((e) => done(e));        
       });  
+  });  
+
+  it('should return 404 if todo not found', (done) => {       
+    request(app)
+      .delete(`/todos/${(new ObjectID).toHexString()}`)
+      .expect(404)
+      .expect( (res) => {                        
+        expect(res.text).toBe('Todo was not found!');
+      })
+      .end(done);  
+  });  
+
+  it('should return 404 if id is not valid', (done) => {       
+    request(app)
+      .delete(`/todos/wfsdfw23423sdfsdfsdf432454`)
+      .expect(404)
+      .expect( (res) => {                        
+        expect(res.text).toBe('Id is not valid!');
+      })
+      .end(done);  
+  });  
+});
+
+describe('PATCH /todos/:id', () => {
+  it('should update todo ', (done) => {   
+    let hexId = todos[0]._id.toHexString();  
+    let updateTodo = {
+      text:"Test",
+      completed: true
+    }  
+
+    request(app)
+      .patch(`/todos/${hexId}`)     
+      .send(updateTodo)
+      .expect(200)
+      .expect( (res) => {                  
+        expect(res.body.todo.text).toBe(updateTodo.text);
+        expect(res.body.todo.completed).toBe(updateTodo.completed);
+        expect(res.body.todo.completedAt).toBeDefined();
+      })  
+      .end(done);  
+  });  
+
+  it('should clear completedAt when is not completed', (done) => {   
+    let hexId = todos[1]._id.toHexString();  
+    let updateTodo = {      
+      completed: false
+    }  
+
+    request(app)
+      .patch(`/todos/${hexId}`)     
+      .send(updateTodo)
+      .expect(200)
+      .expect( (res) => {                     
+        expect(res.body.todo.completed).toBe(updateTodo.completed);
+        expect(res.body.todo.completedAt).toBeNull();
+      })  
+      .end(done);  
   });  
 
   it('should return 404 if todo not found', (done) => {       
