@@ -82,3 +82,18 @@ describe('GET /todos', () => {
       .end(done);
   });  
 });
+
+describe('GET /todos/:id', () => {
+  it('should get direct todo', (done) => {    
+    Todo.findOne().then((todo)=>{ 
+      request(app)
+        .get('/todos/'+todo.id)
+        .expect(200)
+        .expect( (res) => {          
+          expect(JSON.stringify(res.body.todo)).toEqual(JSON.stringify(todo));
+        })
+        .end(done);
+    });
+    
+  });  
+});
