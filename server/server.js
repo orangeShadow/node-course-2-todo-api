@@ -8,6 +8,8 @@ const {User}  = require('./models/user');
 
 const app = express();
 
+const port = precess.env.PORT || 3000;
+
 app.use(bodyParse.json());
 
 app.post('/todos', (req,res) => {
@@ -47,8 +49,8 @@ app.get('/todos/:id', (req,res) => {
 });
 
 if(!module.parent){ 
-  app.listen(3000, () => {
-    console.log('Started on port 3000');
+  app.listen(port, () => {
+    console.log(`Started up at port {port}`);
   });
 }
 
