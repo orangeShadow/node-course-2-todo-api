@@ -21,8 +21,7 @@ const todos = [
 beforeEach( (done) => {
   Todo.remove({}).then(()=> {
     return Todo.insertMany(todos);
-  }).then(() => done());
-
+  }).then(() => done()).catch((e)=>{dine(e);});
 });
 
 describe('POST /todos', () => {
