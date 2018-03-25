@@ -1,14 +1,17 @@
 const expect = require('expect');
 const request = require('supertest');
+const {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 
 const todos = [
   {
+    _id: new ObjectID(),
     text: 'Frist test todo'
   },
   {
+    _id: new ObjectID(),
     text: 'Second test todo'
   }
 ];
@@ -84,16 +87,34 @@ describe('GET /todos', () => {
 });
 
 describe('GET /todos/:id', () => {
-  it('should get direct todo', (done) => {    
-    Todo.findOne().then((todo)=>{ 
-      request(app)
-        .get('/todos/'+todo.id)
-        .expect(200)
-        .expect( (res) => {          
-          expect(JSON.stringify(res.body.todo)).toEqual(JSON.stringify(todo));
-        })
-        .end(done);
-    });
-    
+  it('should return todo doc', (done) => {       
+    request(app)
+      .get(`/todos/${todos[0]._id.toHexString()}`)
+      .expect(200)
+      .expect( (res) => {          
+        //expect(JSON.stringify(res.body.todo)).toEqual(JSON.stringify(todo));
+        expect(res.body.todo.text).toBe(todos[0].text);
+      })
+      .end(done);  
+  });  
+
+  it('should return 404 if todo not found', (done) => {       
+    request(app)
+      .get(`/todos/${(new ObjectID).toHexString()}`)
+      .expect(404)
+      .expect( (res) => {                        
+        expect(res.text).toBe('Todo was not found!');
+      })
+      .end(done);  
+  });  
+
+  it('should return 404 if id is not valid', (done) => {       
+    request(app)
+      .get(`/todos/wfsdfw23423sdfsdfsdf432454`)
+      .expect(404)
+      .expect( (res) => {                        
+        expect(res.text).toBe('Id is not valid!');
+      })
+      .end(done);  
   });  
 });
