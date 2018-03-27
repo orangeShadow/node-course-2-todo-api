@@ -4,6 +4,7 @@ const {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
+const {User} = require('./../models/user');
 
 const todos = [
   {
@@ -22,6 +23,10 @@ beforeEach( (done) => {
   Todo.remove({}).then(()=> {
     return Todo.insertMany(todos);
   }).then(() => done()).catch((e)=>{dine(e);});
+
+  User.remove({}).then( () =>{
+
+  });
 });
 
 describe('POST /todos', () => {
@@ -218,4 +223,63 @@ describe('PATCH /todos/:id', () => {
       })
       .end(done);  
   });  
+});
+
+describe('POST /users', () => {
+  it('should create a new user', (done) => {
+    
+    User.remove({});
+
+    let body = {
+        "name":"John Do",
+        "email": "johndo@test.com",
+        "password": "123qwe!"
+    };
+
+    request(app)
+      .post('/users')
+      .send(body)
+      .expect(200)
+      .expect((res) => {  
+        expect(res.body.email).toBe(body.email);
+        expect(res.body.name).toBe(body.name);
+      })
+      .end((err,res) => {
+        if (err) {
+          return done(err);
+        }
+
+        User.find({email:body.email}).then((users) => {
+          expect(users.length).toBe(1);
+          expect(users[0].email).toBe(body.email);
+          done();
+        }).catch((e) => {
+          done(e);
+        });
+      });
+  });
+
+  // it('should not create todo with invalid body data', (done) => {
+  //      request(app)
+  //     .post('/todos')
+  //     .send({
+  //       "text":""
+  //     })
+  //     .expect(400)
+  //     .expect((res) => {
+  //       expect(res.body.errors.text.message).toBe("Path `text` is required.");
+  //     })
+  //     .end((err, res) => {
+  //       if (err) {
+  //         return done(err);
+  //       }
+
+  //       Todo.find().then((todos) => {
+  //         expect(todos.length).toBe();
+  //         done();
+  //       }).catch((e) => {
+  //         done(e);
+  //       });
+  //     });
+  // });
 });

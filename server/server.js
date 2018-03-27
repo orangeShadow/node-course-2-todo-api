@@ -39,7 +39,7 @@ app.get('/todos/:id', (req,res) => {
     return res.status(404).send('Id is not valid!');
   }
 
-  Todo.findById(id).then((todo)=> {    
+  Todo.findById(id).then((todo)=> {
     if (!todo) {
       return res.status(404).send('Todo was not found!');
     }
@@ -50,7 +50,6 @@ app.get('/todos/:id', (req,res) => {
   });
 });
 
-
 app.delete('/todos/:id', (req,res) => {
   let id  = req.params.id;
 
@@ -58,7 +57,7 @@ app.delete('/todos/:id', (req,res) => {
     return res.status(404).send('Id is not valid!');
   }
 
-  Todo.findByIdAndRemove(id).then((todo)=> {    
+  Todo.findByIdAndRemove(id).then((todo)=> {
     if (!todo) {
       return res.status(404).send('Todo was not found!');
     }
@@ -83,8 +82,8 @@ app.patch('/todos/:id', (req,res) => {
     body.completed = false;
     body.completedAt = null;
   }
- 
-  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo)=> {    
+
+  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo)=> {
     if (!todo) {
       return res.status(404).send('Todo was not found!');
     }
@@ -95,13 +94,25 @@ app.patch('/todos/:id', (req,res) => {
   });
 });
 
+app.post('/users', (req,res) => {
 
+  var body = _.pick(req.body,['name','email','password']);
+  var user = new User(body);
 
-if(!module.parent){ 
+  user.save().then( () =>{
+    return user.generateAuthToken();
+  }).then((token)=>{
+    res.header('x-auth', token).send(user);
+  })
+  .catch( (e) => {
+      res.status(400).send(e);
+  });
+});
+
+if(!module.parent){
   app.listen(port, () => {
     console.log(`Started up at port ${port}`);
   });
 }
-
 
 module.exports = { app };
