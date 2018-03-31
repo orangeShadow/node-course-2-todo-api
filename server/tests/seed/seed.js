@@ -14,6 +14,7 @@ const users = [
     password: 'userOnePass',
     tokens: [
       {
+        _id: new ObjectID().toHexString(),
         'access':'auth',
         'token': jwt.sign({_id: userOneId.toHexString(), 'access':'auth'}, 'qwety').toString()
       }
@@ -24,6 +25,13 @@ const users = [
     name: 'Yuli',
     email:'yuli@example.com',
     password: 'userTwoPass',
+    tokens: [
+      {
+        _id: new ObjectID().toHexString(),
+        'access':'auth',
+        'token': jwt.sign({_id: userTwoId.toHexString(), 'access':'auth'}, 'qwety').toString()
+      }
+    ]
   }
 ];
 
@@ -32,12 +40,14 @@ const todos = [
   {
     _id: new ObjectID(),
     text: 'Frist test todo',
+    _creator: userOneId
   },
   {
     _id: new ObjectID(),
     text: 'Second test todo',
     completed: true,
-    completedAt: 3333
+    completedAt: 3333,
+    _creator: userTwoId
   }
 ];
 
