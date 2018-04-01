@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
-const cryptCode = 'qwety';
+const cryptCode = process.env.JWT_SECRET;
 
 let UserSchema = new mongoose.Schema({
   name: {
